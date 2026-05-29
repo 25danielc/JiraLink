@@ -41,7 +41,16 @@ const sourceField = config.textSource === "field" ? config.changelogFieldId : "s
 const fields = ["summary", "issuetype", "labels", "resolutiondate", "updated"];
 if (config.textSource === "field") fields.push(config.changelogFieldId);
 
+// Echo the exact query and parameters. When the collector returns 0 while the
+// same project clearly has completed tickets, this line is the fastest way to
+// see WHY: a status name that doesn't match Jira (default "Done" vs your
+// "Completed"), the wrong project key, or the -lookbackDays window excluding
+// older tickets your hand-run JQL would still show.
+console.log(`Querying Jira: project=${config.projectKey} status="${config.completedStatus}" lookback=${config.lookbackDays}d source=${config.textSource}`);
+console.log(`JQL: ${jql}`);
+
 const issues = await searchIssues(jql, fields);
+console.log(`Jira returned ${issues.length} issue(s) matching the query.`);
 
 // --- 2-4: normalize new ones into state ---
 let added = 0;
