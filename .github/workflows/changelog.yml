@@ -1,0 +1,50 @@
+name: changelog
+
+on:
+  workflow_dispatch: {} # manual "Run workflow" button (escape hatch / reprocess)
+  repository_dispatch: # fired by Jira's "Send web request" when a ticket completes
+    types: [jira-ticket-completed]
+
+permissions:
+  contents: write # lets the job commit + push the rendered Markdown
+
+# Don't pile up overlapping publishes.
+concurrency:
+  group: changelog
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so the bot commit pushes cleanly
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Collect from Jira
+        run: node scripts/collect.js
+        env:
+          JIRA_BASE: ${{ secrets.JIRA_BASE }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+          CHANGELOG_FIELD_ID: ${{ secrets.CHANGELOG_FIELD_ID }}
+          COMPLETED_STATUS: ${{ secrets.COMPLETED_STATUS }}
+
+      - name: Render feed
+        run: node scripts/render.js
+        env:
+          JIRA_BASE: ${{ secrets.JIRA_BASE }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+
+      - name: Publish (commit + push)
+        run: node scripts/publish.js
+        env:
+          JIRA_BASE: ${{ secrets.JIRA_BASE }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
