@@ -11,7 +11,7 @@
 
 import { writeFileSync, existsSync, readFileSync } from "node:fs";
 import { config } from "../config.js";
-import { searchIssues } from "../lib/jira.js";
+import { searchIssues, getCurrentUser, listVisibleProjects } from "../lib/jira.js";
 import { adfToText } from "../lib/adf.js";
 
 // --- load state ---
@@ -68,12 +68,31 @@ if (issues.length === 0) {
       "project + status + window",
     ],
   ];
+  let projectOnlyCount = null;
   for (const [probeJql, label] of probes) {
     try {
       const n = (await searchIssues(probeJql, ["summary"])).length;
+      if (label === "project only") projectOnlyCount = n;
       console.warn(`  ${n === 0 ? "✗" : "✓"} ${label}: ${n} issue(s)`);
     } catch (err) {
       console.warn(`  ! ${label}: query errored — ${err.message.split("\n")[0]}`);
+    }
+  }
+
+  // If even "project only" is empty, the problem is below JQL: wrong site, wrong
+  // credentials, or a project key this token can't see. Confirm identity and
+  // list the visible project keys so the mismatch is obvious. (The configured
+  // key, if present in the list, is masked by GitHub — its appearing as *** in
+  // the printed list IS the confirmation that it matches.)
+  if (projectOnlyCount === 0) {
+    try {
+      const me = await getCurrentUser();
+      console.warn(`  Authenticated on ${config.jiraBase} as: ${me.emailAddress || me.displayName || me.accountId}`);
+      const keys = await listVisibleProjects();
+      console.warn(`  Projects visible to this token (${keys.length}): ${keys.join(", ") || "(none)"}`);
+      console.warn(`  Configured project key is ${keys.includes(config.projectKey) ? "PRESENT" : "NOT FOUND"} in that list.`);
+    } catch (err) {
+      console.warn(`  Identity/project probe errored: ${err.message.split("\n")[0]}`);
     }
   }
 }
