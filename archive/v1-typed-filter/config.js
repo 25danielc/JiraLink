@@ -37,13 +37,9 @@ export const config = {
   lookbackDays: Number(process.env.LOOKBACK_DAYS || 90),
 
   // --- The contract expressed as data ---
-  // Which issue types to include. EMPTY = count ALL types (no type filter).
-  // To restrict the feed again, list types here, e.g. ["Story", "Task", "Bug"];
-  // a non-empty list re-adds the `issuetype in (...)` clause to the JQL.
-  includeTypes: [],
+  includeTypes: ["Story", "Task", "Bug"], // only these are considered
 
-  // Issue type -> inline category tag. Types not listed fall back to "Feature"
-  // (see collect.js). `breakingLabel` overrides any tag to "Breaking".
+  // Issue type -> inline category tag. `breakingLabel` overrides to "Breaking".
   typeToCategory: {
     Story: "Feature",
     Task: "Feature",

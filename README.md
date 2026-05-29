@@ -30,13 +30,16 @@ Jira ticket -> Completed
      Story/Task/Bug, where engineers write **plain Markdown** that publishes
      verbatim. Good for a **curated, user-facing** feed — a blank field opts the
      ticket out.
-2. **Classification is derived, shown as an inline tag, not entered:**
+2. **Which tickets count:** by default **every issue type** (Story, Task, Bug,
+   Epic, Sub-task, custom types) in the `Completed` status is included. To
+   restrict the feed to specific types, set `includeTypes` in `config.js`.
+3. **Classification is derived, shown as an inline tag, not entered:**
    - Story / Task → **Feature**
    - Bug → **Fix**
+   - Any other type → **Feature** (the fallback tag)
    - Label `breaking` → **⚠️ Breaking** (overrides the type tag)
-   - Label `no-changelog` → excluded entirely (works in **both** modes)
-   - Epics / Sub-tasks → never included
-3. **The trigger:** a Jira Automation rule — _Work item transitioned → to
+   - Label `no-changelog` → excluded entirely
+4. **The trigger:** a Jira Automation rule — _Work item transitioned → to
    `Completed`_ → **Send web request** to GitHub (see below). In `field` mode a
    blank field just means `collect.js` skips that ticket; in `summary` mode
    use the `no-changelog` label to exclude a ticket.

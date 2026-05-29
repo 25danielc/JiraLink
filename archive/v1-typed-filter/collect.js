@@ -22,14 +22,9 @@ state.entries = state.entries || {};
 const known = new Set(Object.keys(state.entries));
 
 // --- 1: query Completed tickets in the window ---
-// Only constrain by issue type when includeTypes is non-empty; an empty list
-// means "count every type" and the clause is omitted entirely.
-const typeClause = config.includeTypes.length
-  ? `AND issuetype in (${config.includeTypes.join(",")}) `
-  : "";
 const jql =
   `project = "${config.projectKey}" ` +
-  typeClause +
+  `AND issuetype in (${config.includeTypes.join(",")}) ` +
   `AND status = "${config.completedStatus}" ` +
   `AND updated >= -${config.lookbackDays}d ` +
   `ORDER BY resolutiondate DESC`;
