@@ -52,6 +52,32 @@ console.log(`JQL: ${jql}`);
 const issues = await searchIssues(jql, fields);
 console.log(`Jira returned ${issues.length} issue(s) matching the query.`);
 
+// When the full query returns nothing, peel the clauses back one at a time to
+// localize which one zeroes it out — without printing any secret values (we log
+// counts only). Whichever probe is the first to return 0 names the culprit:
+//   project       0 -> wrong project key, or auth can't see the project
+//   + status      0 -> the COMPLETED_STATUS name doesn't match Jira exactly
+//   + window      0 -> tickets are completed but not "updated" within lookbackDays
+if (issues.length === 0) {
+  console.warn("Zero results — probing which clause is responsible:");
+  const probes = [
+    [`project = "${config.projectKey}"`, "project only"],
+    [`project = "${config.projectKey}" AND status = "${config.completedStatus}"`, "project + status"],
+    [
+      `project = "${config.projectKey}" AND status = "${config.completedStatus}" AND updated >= -${config.lookbackDays}d`,
+      "project + status + window",
+    ],
+  ];
+  for (const [probeJql, label] of probes) {
+    try {
+      const n = (await searchIssues(probeJql, ["summary"])).length;
+      console.warn(`  ${n === 0 ? "✗" : "✓"} ${label}: ${n} issue(s)`);
+    } catch (err) {
+      console.warn(`  ! ${label}: query errored — ${err.message.split("\n")[0]}`);
+    }
+  }
+}
+
 // --- 2-4: normalize new ones into state ---
 let added = 0;
 for (const issue of issues) {
