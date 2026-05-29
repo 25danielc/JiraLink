@@ -10,7 +10,10 @@
       "PowerShell($sfdx = Get-ChildItem -Recurse -File -Force .sfdx -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum; \"{0} files, {1:N1} MB\" -f $sfdx.Count, \\($sfdx.Sum/1MB\\))",
       "PowerShell(Remove-Item *)",
       "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); node scripts/_selftest.js 2>&1 | Select-Object -Last 3)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(git fetch *)",
+      "Bash(git rev-list *)",
+      "Bash(git ls-tree *)"
     ]
   }
 }

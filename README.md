@@ -1,8 +1,9 @@
 # Changelog pipeline (Jira → GitHub → GitBook)
 
-Deterministic, no-LLM changelog automation. Engineers write a user-facing
-summary into a Jira custom field. When a ticket moves to **Completed**, its
-entry is added to a single reverse-chronological changelog that GitBook syncs.
+Deterministic, no-LLM changelog automation. Each entry's text comes from the
+ticket **summary** by default (an internal/support-facing feed), or optionally
+from a curated custom field. When a ticket moves to **Completed**, its entry is
+added to a single reverse-chronological changelog that GitBook syncs.
 
 - **Unit of work:** the **ticket** (not a release/version).
 - **Trigger:** Jira Automation fires when a ticket transitions to Completed.
@@ -21,17 +22,24 @@ Jira ticket -> Completed
 
 ## The Jira contract
 
-1. **Custom field** "Changelog Entry" (Paragraph), on Story/Task/Bug.
-   Engineers write **plain Markdown** here. It publishes verbatim.
+1. **Entry text** comes from one of two sources, set by `TEXT_SOURCE`:
+   - **`summary`** (default): the built-in ticket **summary**. Good for an
+     **internal** feed (e.g. the engineering support team) — every Completed
+     ticket appears, nothing extra for engineers to fill in.
+   - **`field`**: a custom **"Changelog Entry"** field (Paragraph) on
+     Story/Task/Bug, where engineers write **plain Markdown** that publishes
+     verbatim. Good for a **curated, user-facing** feed — a blank field opts the
+     ticket out.
 2. **Classification is derived, shown as an inline tag, not entered:**
    - Story / Task → **Feature**
    - Bug → **Fix**
    - Label `breaking` → **⚠️ Breaking** (overrides the type tag)
-   - Label `no-changelog` → excluded entirely
+   - Label `no-changelog` → excluded entirely (works in **both** modes)
    - Epics / Sub-tasks → never included
 3. **The trigger:** a Jira Automation rule — _Work item transitioned → to
-   `Completed`_ → **Send web request** to GitHub (see below). No gate; a blank
-   field just means `collect.js` skips that ticket.
+   `Completed`_ → **Send web request** to GitHub (see below). In `field` mode a
+   blank field just means `collect.js` skips that ticket; in `summary` mode
+   use the `no-changelog` label to exclude a ticket.
 
 > Assumption baked in: **Completed = shipped to users.** The changelog publishes
 > the moment a ticket completes, so that status must mean the work is live.
@@ -50,26 +58,32 @@ In the Automation rule, after the trigger, add **Send web request**:
   { "event_type": "jira-ticket-completed" }
   ```
 
-`<GITHUB_TOKEN>` is a **fine-grained PAT** scoped to *only* `Actions: write`
-(and `Contents: read`) on this one repo. Treat it as a secret and restrict who
-can edit the rule. A dropped request is harmless — the next completion (or a
-manual run) reconciles via the lookback window.
+`<GITHUB_TOKEN>` is a **fine-grained PAT** scoped to *only* **Contents: Read and
+write** on this one repo (the permission the `dispatches` endpoint requires).
+Treat it as a secret and restrict who can edit the rule. A dropped request is
+harmless — the next completion (or a manual run) reconciles via the lookback
+window.
 
 ## Setup
 
-1. Create the Jira field + the Automation rule (above).
+1. Create the Automation rule (above). Default `summary` mode needs no custom
+   field; only create one if you want `field` mode (see step 3).
 2. Create an Atlassian API token; gather the values in `.env.example`. A
    **read-only** token is enough — if your token offers scopes, `read:jira-work`
    is all the pipeline needs (it only runs a JQL search and reads fields; it
    never writes to Jira). Auth is HTTP Basic (email + token); the client talks
    to the v3 `/search/jql` endpoint.
-3. Find the "Changelog Entry" field id (looks like `customfield_10050`):
-   Jira → Settings → Issues → Custom fields → find the field → the id is in the
+3. **(Only for `field` mode)** Create a "Changelog Entry" Paragraph field on
+   Story/Task/Bug, then find its id (looks like `customfield_10050`): Jira →
+   Settings → Issues → Custom fields → find the field → the id is in the
    edit-screen URL (`...customFieldId=10050` → `customfield_10050`). Put it in
-   `CHANGELOG_FIELD_ID`. For local runs, `cp .env.example .env` and fill it in.
-4. In GitHub repo settings → Secrets and variables → Actions, add:
+   `CHANGELOG_FIELD_ID` and set the repo variable `TEXT_SOURCE=field`. For local
+   runs, `cp .env.example .env` and fill it in.
+4. In GitHub repo settings → Secrets and variables → Actions, add secrets:
    `JIRA_BASE`, `JIRA_EMAIL`, `JIRA_TOKEN`, `JIRA_PROJECT_KEY`,
-   `CHANGELOG_FIELD_ID`, `COMPLETED_STATUS`.
+   `COMPLETED_STATUS` (plus `CHANGELOG_FIELD_ID` for `field` mode). To use the
+   custom field, also add the **variable** `TEXT_SOURCE=field` (leave it unset
+   for the default summary feed).
 5. Point **GitBook Git Sync** at the `changelog/` folder of this repo.
 
 ## Running it

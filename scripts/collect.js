@@ -29,7 +29,13 @@ const jql =
   `AND updated >= -${config.lookbackDays}d ` +
   `ORDER BY resolutiondate DESC`;
 
-const fields = ["summary", "issuetype", "labels", "resolutiondate", "updated", config.changelogFieldId];
+// The field that becomes each entry's text. "summary" mode reads the built-in
+// summary (always present); "field" mode reads the custom Changelog Entry field.
+const sourceField = config.textSource === "field" ? config.changelogFieldId : "summary";
+
+const fields = ["summary", "issuetype", "labels", "resolutiondate", "updated"];
+if (config.textSource === "field") fields.push(config.changelogFieldId);
+
 const issues = await searchIssues(jql, fields);
 
 // --- 2-4: normalize new ones into state ---
@@ -40,13 +46,15 @@ for (const issue of issues) {
   const labels = issue.fields.labels || [];
   if (labels.includes(config.excludeLabel)) continue; // explicit opt-out
 
-  // v3 returns this rich-text field as an ADF tree; adfToText recovers the
-  // verbatim Markdown the engineer typed (and passes plain strings through).
-  const text = adfToText(issue.fields[config.changelogFieldId]).trim();
+  // summary is a plain string; the custom field comes back as an ADF tree on
+  // v3. adfToText handles both — it recovers verbatim Markdown from ADF and
+  // passes plain strings straight through.
+  const text = adfToText(issue.fields[sourceField]).trim();
   if (!text) {
-    // Nothing enforces the field anymore (gate removed), so this is expected
-    // for internal tickets. Warn and skip; never publish a blank bullet.
-    console.warn(`  ! ${issue.key} has empty Changelog Entry — skipped.`);
+    // In "field" mode a blank field is the opt-out, so this is expected for
+    // internal tickets. In "summary" mode it should never happen (summary is
+    // mandatory) but we guard anyway. Either way: never publish a blank bullet.
+    console.warn(`  ! ${issue.key} has empty ${sourceField} — skipped.`);
     continue;
   }
 

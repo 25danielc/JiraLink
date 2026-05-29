@@ -12,8 +12,19 @@ export const config = {
   // --- What to read ---
   projectKey: process.env.JIRA_PROJECT_KEY || "PROJ", // e.g. "ENG"
 
-  // The custom field holding the verbatim, user-facing changelog text. Find the
-  // id (e.g. "customfield_10050") in Jira: Settings -> Issues -> Custom fields.
+  // Where each entry's text comes from:
+  //   "summary" — the built-in ticket summary. Good for an INTERNAL feed (e.g.
+  //               the engineering support team): every Completed ticket appears,
+  //               no extra field for engineers to fill in. This is the default.
+  //   "field"   — the custom "Changelog Entry" field below. Good for a CURATED,
+  //               user-facing feed: only tickets with text written into it
+  //               appear (a blank field opts the ticket out).
+  // The `no-changelog` label excludes a ticket in either mode.
+  textSource: process.env.TEXT_SOURCE === "field" ? "field" : "summary",
+
+  // Only used when textSource === "field". The custom field holding the
+  // verbatim changelog text. Find the id (e.g. "customfield_10050") in Jira:
+  // Settings -> Issues -> Custom fields.
   changelogFieldId: process.env.CHANGELOG_FIELD_ID || "customfield_XXXXX",
 
   // The exact name of your terminal status — the one that means "shipped".
