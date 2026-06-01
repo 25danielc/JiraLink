@@ -37,6 +37,10 @@ jobs:
           TEXT_SOURCE: ${{ vars.TEXT_SOURCE }}
           CHANGELOG_FIELD_ID: ${{ secrets.CHANGELOG_FIELD_ID }}
           COMPLETED_STATUS: ${{ secrets.COMPLETED_STATUS }}
+          # Custom field ids for the collapsible format (Fix Version uses the
+          # built-in fixVersions, so no secret needed for it).
+          SPRINT_FIELD_ID: ${{ secrets.SPRINT_FIELD_ID }}
+          PACKAGE_VERSION_FIELD_ID: ${{ secrets.PACKAGE_VERSION_FIELD_ID }}
 
       - name: Render feed
         run: node scripts/render.js

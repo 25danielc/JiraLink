@@ -27,6 +27,13 @@ export const config = {
   // Settings -> Issues -> Custom fields.
   changelogFieldId: process.env.CHANGELOG_FIELD_ID || "customfield_XXXXX",
 
+  // Custom fields shown in the collapsible format, given as their Jira field ids
+  // (e.g. "customfield_10020"). Find an id in Jira under Settings -> Issues ->
+  // Custom fields, or via GET /rest/api/3/field. An empty value simply omits
+  // that segment. (Fix Version is Jira's built-in `fixVersions` and needs no id.)
+  sprintFieldId: process.env.SPRINT_FIELD_ID || "",
+  packageVersionFieldId: process.env.PACKAGE_VERSION_FIELD_ID || "",
+
   // The exact name of your terminal status — the one that means "shipped".
   // You called it "Completed"; set COMPLETED_STATUS to match Jira exactly.
   completedStatus: process.env.COMPLETED_STATUS || "Done",

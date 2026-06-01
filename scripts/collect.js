@@ -38,8 +38,17 @@ const jql =
 // summary (always present); "field" mode reads the custom Changelog Entry field.
 const sourceField = config.textSource === "field" ? config.changelogFieldId : "summary";
 
-const fields = ["summary", "issuetype", "labels", "resolutiondate", "updated", "description", "reporter"];
+// Custom field ids (from .env) for the collapsible header/body: Sprint and
+// Package Version. An unset id simply omits that segment. Fix Version is Jira's
+// built-in `fixVersions`, added to the field list directly below.
+const sprintFieldId = config.sprintFieldId;
+const packageFieldId = config.packageVersionFieldId;
+console.log(`Custom fields: sprint=${sprintFieldId || "(unset)"} package=${packageFieldId || "(unset)"}`);
+
+const fields = ["summary", "issuetype", "labels", "resolutiondate", "updated", "description", "fixVersions"];
 if (config.textSource === "field") fields.push(config.changelogFieldId);
+if (sprintFieldId) fields.push(sprintFieldId);
+if (packageFieldId) fields.push(packageFieldId);
 
 // Echo the exact query and parameters. When the collector returns 0 while the
 // same project clearly has completed tickets, this line is the fastest way to
@@ -121,10 +130,12 @@ for (const issue of issues) {
   const breaking = labels.includes(config.breakingLabel);
   const date = (issue.fields.resolutiondate || issue.fields.updated || "").slice(0, 10);
 
-  // New collapsible format reads three fields directly:
-  //   summary     -> the always-visible header title
-  //   reporter    -> the "[Name]" header segment (person who filed the ticket)
-  //   description -> the expandable body (ADF on v3, so adfToText it first)
+  // Fields the collapsible format renders:
+  //   summary        -> header title (after the colon)
+  //   sprint         -> "[sprint] -" header prefix (most recent sprint)
+  //   packageVersion -> "[package version]" header segment
+  //   fixVersion     -> first line of the expandable body
+  //   description    -> the expandable body bullets (ADF on v3 -> adfToText)
   state.entries[issue.key] = {
     key: issue.key,
     date,
@@ -133,7 +144,9 @@ for (const issue of issues) {
     breaking,
     text,
     summary: issue.fields.summary || "",
-    reporter: issue.fields.reporter?.displayName || "",
+    sprint: sprintFieldId ? sprintName(issue.fields[sprintFieldId]) : "",
+    packageVersion: packageFieldId ? fieldText(issue.fields[packageFieldId]) : "",
+    fixVersion: fieldText(issue.fields.fixVersions),
     description: adfToText(issue.fields.description).trim(),
   };
   added++;
@@ -142,3 +155,26 @@ for (const issue of issues) {
 
 writeFileSync(config.stateFile, JSON.stringify(state, null, 2));
 console.log(`Collected ${added} new entr${added === 1 ? "y" : "ies"}. Total: ${Object.keys(state.entries).length}.`);
+
+// --- field value helpers -------------------------------------------------
+// Jira custom fields come back in several shapes. Reduce any of them to one
+// display string: scalars pass through, option/version objects expose
+// .name/.value, and arrays (e.g. fixVersions) join their parts.
+function fieldText(v) {
+  if (v == null) return "";
+  if (typeof v === "string" || typeof v === "number") return String(v);
+  if (Array.isArray(v)) return v.map(fieldText).filter(Boolean).join(", ");
+  if (typeof v === "object") return v.name || v.value || "";
+  return "";
+}
+
+// The Sprint field is an array of sprint objects (newest last); we show the most
+// recent one's name. Tolerates the legacy "...[name=Sprint 5,...]" string form.
+function sprintName(v) {
+  if (!v) return "";
+  const arr = Array.isArray(v) ? v : [v];
+  const last = arr[arr.length - 1];
+  if (!last) return "";
+  if (typeof last === "string") return (last.match(/name=([^,]+)/)?.[1] || last).trim();
+  return last.name || "";
+}

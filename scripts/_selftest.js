@@ -4,8 +4,9 @@
 //   node scripts/_selftest.js
 //
 // Exercises the rules that matter: newest-first order, the collapsible header
-// format ([key][reporter] summary), the breaking marker, description ->
-// single-level bullets (no double-bulleting), and the empty-description case.
+// format ([sprint] - [key][package]: summary), Fix Version on top of the body,
+// description -> single-level bullets (no double-bulleting), empty/optional
+// segments dropping out, and the nothing-to-reveal plain-header case.
 
 // Dummy creds BEFORE importing config (which requires them). Dynamic import so
 // this assignment runs first.
@@ -18,13 +19,14 @@ const { renderFeed } = await import("../lib/render-md.js");
 const { adfToText } = await import("../lib/adf.js");
 
 const entries = [
-  // Multi-line description, including a line the author already bulleted — it
-  // must NOT come out double-bulleted.
-  { key: "PROJ-9", date: "2026-05-28", reporter: "Jane Doe", breaking: false, summary: "Add dark mode", description: "Toggle it from Settings > Appearance.\n- Respects the OS preference" },
-  // Breaking change -> ⚠️ prepended to the summary.
-  { key: "PROJ-12", date: "2026-05-27", reporter: "Sam Lee", breaking: true, summary: "Remove legacy /v1 export endpoint", description: "Migrate to /v2." },
-  // Empty description -> plain header line, no <details>.
-  { key: "PROJ-15", date: "2026-05-29", reporter: "", breaking: false, summary: "Fix CSV export dropping the last row", description: "" },
+  // Full header (sprint + package version) + Fix Version + multi-line desc whose
+  // second line the author already bulleted — it must NOT come out double-bulleted.
+  { key: "KAN-9", date: "2026-05-28", sprint: "Sprint 12", packageVersion: "v2.3.1", fixVersion: "2026.6.0", summary: "Add dark mode", description: "Toggle it from Settings > Appearance.\n- Respects the OS preference" },
+  // No sprint, no package version -> bare "[key]: summary". Fix Version present.
+  { key: "KAN-12", date: "2026-05-27", sprint: "", packageVersion: "", fixVersion: "2026.5.2", summary: "Remove legacy /v1 export endpoint", description: "Migrate to /v2." },
+  // Sprint set but no Fix Version and empty description -> nothing to reveal, so
+  // a plain header line (no <details>).
+  { key: "KAN-15", date: "2026-05-29", sprint: "Sprint 12", packageVersion: "", fixVersion: "", summary: "Fix CSV export dropping the last row", description: "" },
 ];
 
 const md = renderFeed(entries, config);
@@ -37,16 +39,15 @@ function check(label, cond) {
 
 console.log("----- rendered changelog/README.md -----\n" + md);
 console.log("----- checks -----");
-check("newest entry (PROJ-15, 05-29) is first", md.indexOf("PROJ-15") < md.indexOf("PROJ-9"));
-check("middle entry (PROJ-9, 05-28) before oldest (PROJ-12, 05-27)", md.indexOf("PROJ-9") < md.indexOf("PROJ-12"));
-check("header format [key][reporter] summary", md.includes("<summary>[PROJ-9][Jane Doe] Add dark mode</summary>"));
-check("breaking marker prepended to summary", md.includes("<summary>[PROJ-12][Sam Lee] ⚠️ Remove legacy /v1 export endpoint</summary>"));
-check("collapsible block emitted", md.includes("<details>") && md.includes("</details>"));
-check("blank line after </summary> (GitBook list parsing)", md.includes("</summary>\n\n- "));
+check("newest entry (KAN-15, 05-29) is first", md.indexOf("KAN-15") < md.indexOf("KAN-9"));
+check("middle entry (KAN-9, 05-28) before oldest (KAN-12, 05-27)", md.indexOf("KAN-9") < md.indexOf("KAN-12"));
+check("full header [sprint] - [key][package]: summary", md.includes("<summary>[Sprint 12] - [KAN-9][v2.3.1]: Add dark mode</summary>"));
+check("Fix Version sits at the top of the body, before the first bullet", md.includes("**Fix Version:** 2026.6.0") && md.indexOf("**Fix Version:** 2026.6.0") < md.indexOf("- Toggle it from Settings"));
+check("blank line after </summary> (GitBook parsing)", md.includes("</summary>\n\n"));
 check("description rendered as a bullet", md.includes("- Toggle it from Settings > Appearance."));
 check("pre-bulleted line is NOT double-bulleted", md.includes("- Respects the OS preference") && !md.includes("- - Respects"));
-check("missing reporter -> segment dropped", md.includes("[PROJ-15] Fix CSV export dropping the last row"));
-check("empty description -> plain header, no <details> for that entry", !md.includes("<summary>[PROJ-15]"));
+check("missing sprint+package -> bare [key]: summary", md.includes("<summary>[KAN-12]: Remove legacy /v1 export endpoint</summary>"));
+check("nothing to reveal -> plain header, no <details> for that entry", md.includes("[Sprint 12] - [KAN-15]: Fix CSV export dropping the last row") && !md.includes("<summary>[Sprint 12] - [KAN-15]"));
 
 // --- ADF conversion: API v3 returns the changelog field as an ADF tree, so
 // collect.js runs it through adfToText. These checks pin that behavior. -----
