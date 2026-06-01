@@ -1,3 +1,6 @@
+# Local engineering notes — not part of the published pipeline
+ARCHITECTURE.md
+
 # Local env — never commit real credentials
 .env
 

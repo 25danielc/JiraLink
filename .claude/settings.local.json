@@ -15,7 +15,10 @@
       "Bash(git rev-list *)",
       "Bash(git ls-tree *)",
       "Bash(git tag *)",
-      "Bash(JIRA_BASE=https://x.invalid JIRA_EMAIL=a@b.c JIRA_TOKEN=x JIRA_PROJECT_KEY=ENG node -e \"import\\('./config.js'\\).then\\(m=>{const c=m.config;const tc=c.includeTypes.length?'AND issuetype in \\('+c.includeTypes.join\\(','\\)+'\\) ':'';console.log\\('includeTypes:',JSON.stringify\\(c.includeTypes\\)\\);console.log\\('JQL:', 'project = \\\\\"'+c.projectKey+'\\\\\" '+tc+'AND status = \\\\\"'+c.completedStatus+'\\\\\" AND updated >= -'+c.lookbackDays+'d ORDER BY resolutiondate DESC'\\);}\\)\")"
+      "Bash(JIRA_BASE=https://x.invalid JIRA_EMAIL=a@b.c JIRA_TOKEN=x JIRA_PROJECT_KEY=ENG node -e \"import\\('./config.js'\\).then\\(m=>{const c=m.config;const tc=c.includeTypes.length?'AND issuetype in \\('+c.includeTypes.join\\(','\\)+'\\) ':'';console.log\\('includeTypes:',JSON.stringify\\(c.includeTypes\\)\\);console.log\\('JQL:', 'project = \\\\\"'+c.projectKey+'\\\\\" '+tc+'AND status = \\\\\"'+c.completedStatus+'\\\\\" AND updated >= -'+c.lookbackDays+'d ORDER BY resolutiondate DESC'\\);}\\)\")",
+      "Bash(git ls-remote *)",
+      "Bash(git mv *)",
+      "Bash(JIRA_BASE=x JIRA_EMAIL=x JIRA_TOKEN=x node *)"
     ]
   }
 }

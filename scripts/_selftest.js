@@ -3,8 +3,9 @@
 //
 //   node scripts/_selftest.js
 //
-// Exercises the rules that matter: newest-first order, verbatim text, multi-line
-// indentation, the inline category tag, the breaking tag, and traceability.
+// Exercises the rules that matter: newest-first order, the collapsible header
+// format ([key][reporter] summary), the breaking marker, description ->
+// single-level bullets (no double-bulleting), and the empty-description case.
 
 // Dummy creds BEFORE importing config (which requires them). Dynamic import so
 // this assignment runs first.
@@ -17,9 +18,13 @@ const { renderFeed } = await import("../lib/render-md.js");
 const { adfToText } = await import("../lib/adf.js");
 
 const entries = [
-  { key: "PROJ-9", date: "2026-05-28", type: "Story", category: "Feature", breaking: false, text: "Added dark mode.\nToggle it from Settings > Appearance." },
-  { key: "PROJ-12", date: "2026-05-27", type: "Bug", category: "Breaking", breaking: true, text: "Removed the legacy /v1 export endpoint. Migrate to /v2." },
-  { key: "PROJ-15", date: "2026-05-29", type: "Bug", category: "Fix", breaking: false, text: "Fixed CSV export dropping the last row." },
+  // Multi-line description, including a line the author already bulleted — it
+  // must NOT come out double-bulleted.
+  { key: "PROJ-9", date: "2026-05-28", reporter: "Jane Doe", breaking: false, summary: "Add dark mode", description: "Toggle it from Settings > Appearance.\n- Respects the OS preference" },
+  // Breaking change -> ⚠️ prepended to the summary.
+  { key: "PROJ-12", date: "2026-05-27", reporter: "Sam Lee", breaking: true, summary: "Remove legacy /v1 export endpoint", description: "Migrate to /v2." },
+  // Empty description -> plain header line, no <details>.
+  { key: "PROJ-15", date: "2026-05-29", reporter: "", breaking: false, summary: "Fix CSV export dropping the last row", description: "" },
 ];
 
 const md = renderFeed(entries, config);
@@ -34,12 +39,14 @@ console.log("----- rendered changelog/README.md -----\n" + md);
 console.log("----- checks -----");
 check("newest entry (PROJ-15, 05-29) is first", md.indexOf("PROJ-15") < md.indexOf("PROJ-9"));
 check("middle entry (PROJ-9, 05-28) before oldest (PROJ-12, 05-27)", md.indexOf("PROJ-9") < md.indexOf("PROJ-12"));
-check("verbatim text preserved", md.includes("Removed the legacy /v1 export endpoint. Migrate to /v2."));
-check("multi-line continuation is indented", md.includes("\n  Toggle it from Settings > Appearance."));
-check("category tag present", md.includes("**Fix**") && md.includes("**Feature**"));
-check("breaking tag rendered", md.includes("**⚠️ Breaking**"));
-check("completion date shown", md.includes("_(2026-05-29)_"));
-check("traceability comment embedded", md.includes("<!-- PROJ-9 -->"));
+check("header format [key][reporter] summary", md.includes("<summary>[PROJ-9][Jane Doe] Add dark mode</summary>"));
+check("breaking marker prepended to summary", md.includes("<summary>[PROJ-12][Sam Lee] ⚠️ Remove legacy /v1 export endpoint</summary>"));
+check("collapsible block emitted", md.includes("<details>") && md.includes("</details>"));
+check("blank line after </summary> (GitBook list parsing)", md.includes("</summary>\n\n- "));
+check("description rendered as a bullet", md.includes("- Toggle it from Settings > Appearance."));
+check("pre-bulleted line is NOT double-bulleted", md.includes("- Respects the OS preference") && !md.includes("- - Respects"));
+check("missing reporter -> segment dropped", md.includes("[PROJ-15] Fix CSV export dropping the last row"));
+check("empty description -> plain header, no <details> for that entry", !md.includes("<summary>[PROJ-15]"));
 
 // --- ADF conversion: API v3 returns the changelog field as an ADF tree, so
 // collect.js runs it through adfToText. These checks pin that behavior. -----

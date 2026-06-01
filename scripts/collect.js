@@ -38,7 +38,7 @@ const jql =
 // summary (always present); "field" mode reads the custom Changelog Entry field.
 const sourceField = config.textSource === "field" ? config.changelogFieldId : "summary";
 
-const fields = ["summary", "issuetype", "labels", "resolutiondate", "updated"];
+const fields = ["summary", "issuetype", "labels", "resolutiondate", "updated", "description", "reporter"];
 if (config.textSource === "field") fields.push(config.changelogFieldId);
 
 // Echo the exact query and parameters. When the collector returns 0 while the
@@ -121,6 +121,10 @@ for (const issue of issues) {
   const breaking = labels.includes(config.breakingLabel);
   const date = (issue.fields.resolutiondate || issue.fields.updated || "").slice(0, 10);
 
+  // New collapsible format reads three fields directly:
+  //   summary     -> the always-visible header title
+  //   reporter    -> the "[Name]" header segment (person who filed the ticket)
+  //   description -> the expandable body (ADF on v3, so adfToText it first)
   state.entries[issue.key] = {
     key: issue.key,
     date,
@@ -128,6 +132,9 @@ for (const issue of issues) {
     category: breaking ? "Breaking" : config.typeToCategory[type] || "Feature",
     breaking,
     text,
+    summary: issue.fields.summary || "",
+    reporter: issue.fields.reporter?.displayName || "",
+    description: adfToText(issue.fields.description).trim(),
   };
   added++;
   console.log(`  + ${issue.key} (${date}) ${breaking ? "Breaking" : type}`);
