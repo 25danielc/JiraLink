@@ -17,6 +17,12 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      # Surface which ticket woke us, when the Jira rule sends it. The pipeline
+      # doesn't depend on the payload (collect.js always re-queries Jira), so
+      # this is purely a breadcrumb in the run log. Empty on a manual run.
+      - name: Triggered by
+        run: echo "event=${{ github.event_name }} issue=${{ github.event.client_payload.issue_key }}"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # full history so the bot commit pushes cleanly
@@ -32,10 +38,6 @@ jobs:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
           JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
-          # Text source: leave unset for "summary" (default). Set the repo
-          # variable TEXT_SOURCE=field to use the custom Changelog Entry field.
-          TEXT_SOURCE: ${{ vars.TEXT_SOURCE }}
-          CHANGELOG_FIELD_ID: ${{ secrets.CHANGELOG_FIELD_ID }}
           COMPLETED_STATUS: ${{ secrets.COMPLETED_STATUS }}
           # Custom field ids for the collapsible format (Fix Version uses the
           # built-in fixVersions, so no secret needed for it).
