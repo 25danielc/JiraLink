@@ -215,6 +215,15 @@
       "packageVersion": "v67.1",
       "fixVersion": "",
       "description": "Deliverable Test\n\nDoes this work? \n\nHopefully ….\n\nOr this would be really embarassing"
+    },
+    "KAN-26": {
+      "key": "KAN-26",
+      "date": "2026-06-02",
+      "summary": "Mike Test (Real)",
+      "sprint": "Tuesday Afternoon",
+      "packageVersion": "v3.01.6.2.26",
+      "fixVersion": "",
+      "description": "Project Test\n\nDo bullet points work?\n\nThey better…"
     }
   }
 }

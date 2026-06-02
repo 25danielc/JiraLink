@@ -1,6 +1,15 @@
 # Changelog
 
 <details>
+<summary>[Tuesday Afternoon] - [KAN-26][v3.01.6.2.26]: Mike Test (Real)</summary>
+
+- Project Test
+- Do bullet points work?
+- They better…
+
+</details>
+
+<details>
 <summary>[Summer 26 Internship] - [KAN-25][v67.1]: Mike Test</summary>
 
 - Deliverable Test
