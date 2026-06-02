@@ -15,6 +15,6 @@ const state = existsSync(config.stateFile)
 const entries = Object.values(state.entries || {});
 
 mkdirSync(config.outDir, { recursive: true });
-writeFileSync(config.feedFile, renderFeed(entries, config));
+writeFileSync(config.feedFile, renderFeed(entries));
 
 console.log(`Rendered ${entries.length} entr${entries.length === 1 ? "y" : "ies"} -> ${config.feedFile}`);

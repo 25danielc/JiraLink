@@ -8,15 +8,10 @@
 // body, description -> single-level bullets (no double-bulleting), empty/optional
 // segments dropping out, and the empty-description-still-gets-a-dropdown case.
 
-// Dummy creds BEFORE importing config (which requires them). Dynamic import so
-// this assignment runs first.
-process.env.JIRA_BASE ||= "https://selftest.invalid";
-process.env.JIRA_EMAIL ||= "selftest@example.com";
-process.env.JIRA_TOKEN ||= "selftest";
-
-const { config } = await import("../config.js");
-const { renderFeed } = await import("../lib/render-md.js");
-const { adfToText } = await import("../lib/adf.js");
+// The rendering core is pure (no config, no network, no secrets), so the test
+// imports it directly.
+import { renderFeed } from "../lib/render-md.js";
+import { adfToText } from "../lib/adf.js";
 
 const entries = [
   // Full header (sprint + package version) + Fix Version + multi-line desc whose
@@ -29,7 +24,7 @@ const entries = [
   { key: "KAN-15", date: "2026-05-29", sprint: "Sprint 12", packageVersion: "", fixVersion: "", summary: "Fix CSV export dropping the last row", description: "" },
 ];
 
-const md = renderFeed(entries, config);
+const md = renderFeed(entries);
 
 let failures = 0;
 function check(label, cond) {
