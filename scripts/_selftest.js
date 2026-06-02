@@ -3,10 +3,10 @@
 //
 //   node scripts/_selftest.js
 //
-// Exercises the rules that matter: newest-first order, the collapsible header
-// format ([sprint] - [key][package]: summary), Fix Version on top of the body,
-// description -> single-level bullets (no double-bulleting), empty/optional
-// segments dropping out, and the nothing-to-reveal plain-header case.
+// Exercises the rules that matter: highest-ticket-id-first order, the collapsible
+// header format ([sprint] - [key][package]: summary), Fix Version on top of the
+// body, description -> single-level bullets (no double-bulleting), empty/optional
+// segments dropping out, and the empty-description-still-gets-a-dropdown case.
 
 // Dummy creds BEFORE importing config (which requires them). Dynamic import so
 // this assignment runs first.
@@ -39,15 +39,15 @@ function check(label, cond) {
 
 console.log("----- rendered changelog/README.md -----\n" + md);
 console.log("----- checks -----");
-check("newest entry (KAN-15, 05-29) is first", md.indexOf("KAN-15") < md.indexOf("KAN-9"));
-check("middle entry (KAN-9, 05-28) before oldest (KAN-12, 05-27)", md.indexOf("KAN-9") < md.indexOf("KAN-12"));
+check("highest id (KAN-15) is first, then KAN-12, then KAN-9", md.indexOf("KAN-15") < md.indexOf("KAN-12") && md.indexOf("KAN-12") < md.indexOf("KAN-9"));
+check("ids sort numerically, not lexically (KAN-12 above KAN-9)", md.indexOf("KAN-12") < md.indexOf("KAN-9"));
 check("full header [sprint] - [key][package]: summary", md.includes("<summary>[Sprint 12] - [KAN-9][v2.3.1]: Add dark mode</summary>"));
 check("Fix Version sits at the top of the body, before the first bullet", md.includes("**Fix Version:** 2026.6.0") && md.indexOf("**Fix Version:** 2026.6.0") < md.indexOf("- Toggle it from Settings"));
 check("blank line after </summary> (GitBook parsing)", md.includes("</summary>\n\n"));
 check("description rendered as a bullet", md.includes("- Toggle it from Settings > Appearance."));
 check("pre-bulleted line is NOT double-bulleted", md.includes("- Respects the OS preference") && !md.includes("- - Respects"));
 check("missing sprint+package -> bare [key]: summary", md.includes("<summary>[KAN-12]: Remove legacy /v1 export endpoint</summary>"));
-check("nothing to reveal -> plain header, no <details> for that entry", md.includes("[Sprint 12] - [KAN-15]: Fix CSV export dropping the last row") && !md.includes("<summary>[Sprint 12] - [KAN-15]"));
+check("empty description still gets a dropdown (same <details>/<summary> format)", md.includes("<summary>[Sprint 12] - [KAN-15]: Fix CSV export dropping the last row</summary>"));
 
 // --- ADF conversion: API v3 returns the changelog field as an ADF tree, so
 // collect.js runs it through adfToText. These checks pin that behavior. -----
