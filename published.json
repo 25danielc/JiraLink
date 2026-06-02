@@ -206,6 +206,15 @@
       "packageVersion": "",
       "fixVersion": "",
       "description": "Ji RA"
+    },
+    "KAN-25": {
+      "key": "KAN-25",
+      "date": "2026-06-02",
+      "summary": "Mike Test",
+      "sprint": "Summer 26 Internship",
+      "packageVersion": "v67.1",
+      "fixVersion": "",
+      "description": "Deliverable Test\n\nDoes this work? \n\nHopefully ….\n\nOr this would be really embarassing"
     }
   }
 }
