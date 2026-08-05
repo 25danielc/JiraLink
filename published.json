@@ -269,6 +269,15 @@
       "packageVersion": "",
       "fixVersion": "",
       "description": ""
+    },
+    "KAN-32": {
+      "key": "KAN-32",
+      "date": "2026-08-05",
+      "summary": "Bananae",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": ""
     }
   }
 }
