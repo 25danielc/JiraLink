@@ -251,6 +251,24 @@
       "packageVersion": "",
       "fixVersion": "",
       "description": ""
+    },
+    "KAN-31": {
+      "key": "KAN-31",
+      "date": "2026-08-05",
+      "summary": "Tucker",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": ""
+    },
+    "KAN-30": {
+      "key": "KAN-30",
+      "date": "2026-08-05",
+      "summary": "Tucket",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": ""
     }
   }
 }

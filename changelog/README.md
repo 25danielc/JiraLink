@@ -1,6 +1,16 @@
 # Changelog
 
 <details>
+<summary>[KAN-31]: Tucker</summary>
+
+</details>
+
+<details>
+<summary>[KAN-30]: Tucket</summary>
+
+</details>
+
+<details>
 <summary>[KAN-29]: banger</summary>
 
 </details>
