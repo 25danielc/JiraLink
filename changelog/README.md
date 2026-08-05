@@ -1,6 +1,11 @@
 # Changelog
 
 <details>
+<summary>[KAN-33]: Vibe</summary>
+
+</details>
+
+<details>
 <summary>[KAN-32]: Bananae</summary>
 
 </details>

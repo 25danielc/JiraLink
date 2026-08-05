@@ -278,6 +278,15 @@
       "packageVersion": "",
       "fixVersion": "",
       "description": ""
+    },
+    "KAN-33": {
+      "key": "KAN-33",
+      "date": "2026-08-05",
+      "summary": "Vibe",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": ""
     }
   }
 }
