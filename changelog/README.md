@@ -1,6 +1,11 @@
 # Changelog
 
 <details>
+<summary>[KAN-29]: banger</summary>
+
+</details>
+
+<details>
 <summary>[KAN-28]: August 5 Reviist</summary>
 
 - High key I spelled it wrong

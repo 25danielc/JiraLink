@@ -242,6 +242,15 @@
       "packageVersion": "",
       "fixVersion": "",
       "description": "High key I spelled it wrong\n\nTo be or not to be that is the question\n\nWhether tis nobler to suffer\n\nthe slings and arrows of outrageous fortune i high forgot the rest"
+    },
+    "KAN-29": {
+      "key": "KAN-29",
+      "date": "2026-08-05",
+      "summary": "banger",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": ""
     }
   }
 }
