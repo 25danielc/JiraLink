@@ -1,6 +1,16 @@
 # Changelog
 
 <details>
+<summary>[KAN-28]: August 5 Reviist</summary>
+
+- High key I spelled it wrong
+- To be or not to be that is the question
+- Whether tis nobler to suffer
+- the slings and arrows of outrageous fortune i high forgot the rest
+
+</details>
+
+<details>
 <summary>[KAN-27]: Hello</summary>
 
 </details>

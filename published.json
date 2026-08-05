@@ -233,6 +233,15 @@
       "packageVersion": "",
       "fixVersion": "",
       "description": ""
+    },
+    "KAN-28": {
+      "key": "KAN-28",
+      "date": "2026-08-05",
+      "summary": "August 5 Reviist",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": "High key I spelled it wrong\n\nTo be or not to be that is the question\n\nWhether tis nobler to suffer\n\nthe slings and arrows of outrageous fortune i high forgot the rest"
     }
   }
 }
