@@ -1,6 +1,11 @@
 # Changelog
 
 <details>
+<summary>[KAN-27]: Hello</summary>
+
+</details>
+
+<details>
 <summary>[Tuesday Afternoon] - [KAN-26][v3.01.6.2.26]: Mike Test (Real)</summary>
 
 - Project Test

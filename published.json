@@ -224,6 +224,15 @@
       "packageVersion": "v3.01.6.2.26",
       "fixVersion": "",
       "description": "Project Test\n\nDo bullet points work?\n\nThey better…"
+    },
+    "KAN-27": {
+      "key": "KAN-27",
+      "date": "2026-08-05",
+      "summary": "Hello",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": ""
     }
   }
 }
