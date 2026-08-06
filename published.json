@@ -287,6 +287,24 @@
       "packageVersion": "",
       "fixVersion": "",
       "description": ""
+    },
+    "KAN-35": {
+      "key": "KAN-35",
+      "date": "2026-08-06",
+      "summary": "Git2Git",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": "e etes"
+    },
+    "KAN-34": {
+      "key": "KAN-34",
+      "date": "2026-08-06",
+      "summary": "8/6PReTest",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": ""
     }
   }
 }

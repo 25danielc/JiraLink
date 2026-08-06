@@ -1,6 +1,18 @@
 # Changelog
 
 <details>
+<summary>[KAN-35]: Git2Git</summary>
+
+- e etes
+
+</details>
+
+<details>
+<summary>[KAN-34]: 8/6PReTest</summary>
+
+</details>
+
+<details>
 <summary>[KAN-33]: Vibe</summary>
 
 </details>
