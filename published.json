@@ -305,6 +305,15 @@
       "packageVersion": "",
       "fixVersion": "",
       "description": ""
+    },
+    "KAN-36": {
+      "key": "KAN-36",
+      "date": "2026-08-06",
+      "summary": "Turn Off a flow",
+      "sprint": "",
+      "packageVersion": "",
+      "fixVersion": "",
+      "description": "lah"
     }
   }
 }

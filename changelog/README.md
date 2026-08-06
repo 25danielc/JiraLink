@@ -1,6 +1,13 @@
 # Changelog
 
 <details>
+<summary>[KAN-36]: Turn Off a flow</summary>
+
+- lah
+
+</details>
+
+<details>
 <summary>[KAN-35]: Git2Git</summary>
 
 - e etes
